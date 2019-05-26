@@ -201,6 +201,9 @@ class Alimentos extends CI_Controller {
                 $pdomodel = $pdocrud->getPDOModelObj();
                 $pdomodel->where("idAlimentoNuevo", $id);
                 $pdomodel->update("alimento_nuevo", $updateData);
+                //Insertar en Alimentos
+                $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]);
+                $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
                 redirect('/Alimentos/pendientes/');
             }else{
                 echo 'no guardado';
