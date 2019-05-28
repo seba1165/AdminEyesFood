@@ -59,7 +59,7 @@ modalConfirm(function(confirm){
   if(confirm){
     //Acciones si el usuario confirma
     window.location.href = "<?php echo base_url().'Alimentos/Aprobar/'.$ind["idAlimentoNuevo"]; ?>";
-    alert('El alimento ha sido aprobado exitosamente');
+    //alert('El alimento ha sido aprobado exitosamente');
   }else{
     //Acciones si el usuario no confirma
   }
@@ -87,7 +87,7 @@ modalConfirm(function(confirm){
   if(confirm){
     //Acciones si el usuario confirma
     window.location.href = "<?php echo base_url().'Alimentos/rechazar/'.$ind["idAlimentoNuevo"]; ?>";
-    alert('El alimento ha sido rechazado exitosamente');
+    //alert('El alimento ha sido rechazado exitosamente');
   }else{
     //Acciones si el usuario no confirma
     

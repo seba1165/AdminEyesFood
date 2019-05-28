@@ -103,6 +103,7 @@
                                     <li><a href="#"><i class="fa fa-times"></i> Rechazados</a></li>
                                   </ul>
                                 </li>
+                                <li><a href="<?php echo base_url();?>Alimentos/imagenes"><i class="fa fa-image"></i> <span>Imagenes</span></a></li>
                                 <li><a href="<?php echo base_url();?>Alimentos/todos"><i class="fa fa-list"></i> <span>Todos</span></a></li>
                             </ul>
                         </li>
