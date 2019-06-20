@@ -3,9 +3,9 @@
  * PDOCrud - Advance PHP CRUD application using PDO
  * File: PDOCrud.php
  * Author: Pritesh Gupta
- * Version: 4.1.1
- * Date: 21-Aug-2016
- * Last Update : 01-Apr-2019
+ * Version: 4.2.1
+ * Release Date: 21-Aug-2016
+ * Last Update : 01-jun-2019
  *
  * Copyright (c) 2019 Pritesh Gupta. All Rights Reserved.
 
@@ -795,15 +795,19 @@ Class PDOCrud {
      * @param   mixed   $val                                   name of col as string or array of columns, that will serve as field value
      * @param   string  $bind                                  whether datasource is db table or array or sql, default is db table
      * @param   string  $separator                             Separator string in case of $val is an array of columns. Default value is " "
+     * @param   string  $where                                 Where condition for the datasource
+     * @param   string  $orderby                               Order by clause for the datasource
      * return   object                                         Object of class
      */
-    public function fieldDataBinding($fieldName, $dataSource, $key, $val, $bind = "db", $separator = " ") {
+    public function fieldDataBinding($fieldName, $dataSource, $key, $val, $bind = "db", $separator = " ", $where = array(), $orderby = array()) {
         $this->fieldDataBind[$fieldName] = array(
             "tableName" => $dataSource,
             "key" => $key,
             "val" => $val,
             "bind" => $bind,
-            "separator" => $separator
+            "separator" => $separator,
+            "where" => $where,
+            "orderby" => $orderby
         );
         if ($bind == "array") {
             $dataSource = $this->formatDatasource($dataSource);
@@ -1336,13 +1340,18 @@ Class PDOCrud {
      * Add where condition
      * @param   string   $colName                          column name for which where condition to be applied
      * @param   string   $val                              value of column
-     * @param   string   $operator                         any operator like =, !=
+     * @param   string   $operator                         any operator like =, !=, default value is "="
+     * @param   string   $andOroperator                    whether to use "and" or "or" operator, if empty, default andOrOperator = "and" will be used
+     * @param   string   $bracket                          whether to use opening "(" or closing bracket ")", leave empty if not required
      * return   object                                     Object of class
      */
-    public function where($colName, $val, $operator = "=") {
-        $this->whereCondition[$colName] = array(
+    public function where($colName, $val, $operator = "=", $andOroperator = "", $bracket = "") {
+        $this->whereCondition[] = array(
             "val" => $val,
-            "operator" => $operator
+            "operator" => $operator,
+            "andOroperator" => $andOroperator,
+            "bracket" => $bracket,
+            "colName" => $colName
         );
         return $this;
     }
@@ -3989,6 +3998,19 @@ Class PDOCrud {
                         $this->fieldDataBind[$fieldName]["val"]
                     );
                 }
+                //apply where condition
+                if (is_array($this->fieldDataBind[$fieldName]["where"]) && count($this->fieldDataBind[$fieldName]["where"]) > 0) {
+                    foreach($this->fieldDataBind[$fieldName]["where"] as $where){
+                        if(isset($where[0]) && isset($where[1]) && isset($where[2]))
+                            $pdoModelObj->where($where[0], $where[1], $where[2]);
+                    }
+                }
+                //apply order by condition
+                if (is_array($this->fieldDataBind[$fieldName]["orderby"]) && count($this->fieldDataBind[$fieldName]["orderby"]) > 0) {
+                    $orderByCols = implode($this->fieldDataBind[$fieldName]["orderby"], ",");
+                    $pdoModelObj->orderByCols = array($orderByCols);
+                }
+
                 $data = $pdoModelObj->select($this->fieldDataBind[$fieldName]["tableName"]);
                 return $data;
             } else {
@@ -4603,6 +4625,7 @@ Class PDOCrud {
             $obj = $relation["obj"];
             if (isset($relation["field2"]) && isset($relation["field1"])){
                 $obj->where($relation["field2"], $result[0][$relation["field1"]]);
+                $obj->formFieldValue($relation["field2"], $result[0][$relation["field1"]]);
                 $obj->formStaticFields($relation["field2"], "hidden", array($result[0][$relation["field1"]]), "db", $relation["field2"]); 
             }
 
@@ -4719,8 +4742,19 @@ Class PDOCrud {
         }
 
         if (isset($this->whereCondition)) {
-            foreach ($this->whereCondition as $colWhere => $where)
-                $pdoModelObj->where($colWhere, $where["val"], $where["operator"]);
+            foreach ($this->whereCondition as $colWhere => $where){
+                if(isset($where["bracket"]) && $where["bracket"] === "("){
+                    $pdoModelObj->openBrackets = "(";
+                }
+                if(isset($where["andOroperator"]) && !empty($where["andOroperator"])){
+                    $pdoModelObj->andOrOperator = $where["andOroperator"];
+                }
+                $pdoModelObj->where($where["colName"], $where["val"], $where["operator"]);
+                if(isset($where["bracket"]) && $where["bracket"] === ")"){
+                    $pdoModelObj->closedBrackets = ")";
+                }
+            }
+            $pdoModelObj->andOrOperator = "AND";
         }
         
         if (isset($data["actionId"])) {

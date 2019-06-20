@@ -2,8 +2,10 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Alimentos extends CI_Controller {
     public $url = 'https://cl.openfoodfacts.net/cgi/product_jqm2.pl';
+    public $urlGet = 'https://cl.openfoodfacts.org/api/v0/product/';
     public $urlImage = 'https://cl.openfoodfacts.net/cgi/product_image_upload.pl';
     public $urlImageRemote = 'http://localhost/api.eyesfood.cl/v1/img/uploads/';
+    public $urlApiComments = 'http://localhost/api.eyesfood.comments.cl/v1/';
     //public $base_dir = __DIR__."/temps/";
     public function __construct() {
         parent::__construct();
@@ -102,11 +104,20 @@ class Alimentos extends CI_Controller {
             $text = '<i class="fa fa-external-link" aria-hidden="true"></i>';
             $attr = array("title"=>"Abrir en OpenFoodFacts");
             $pdocrud->enqueueBtnActions("url", $action, "url",$text,"denuncia", $attr);
+            $action = "comentarios/{pk}";//pk will be replaced by primary key value
+            $text = '<i class="fa fa-comments" aria-hidden="true"></i>';
+            $attr = array("title"=>"Comentarios");
+            $pdocrud->enqueueBtnActions("url2", $action, "url",$text,"denuncia", $attr);
+            $action = "recomendaciones/{pk}";//pk will be replaced by primary key value
+            $text = '<i class="fa fa-medkit" aria-hidden="true"></i>';
+            $attr = array("title"=>"Recomendaciones");
+            $pdocrud->enqueueBtnActions("url3", $action, "url",$text,"denuncia", $attr);
             $pdocrud->relatedData("idPeligroAlimento", "peligro_alimento", "idPeligroAlimento", "descripcion");
             $pdocrud->relatedData("idUsuario", "usuarios", "idUsuario", "correo");
             $pdocrud->fieldRenameLable("idUsuario", "Usuario");//Rename label
             $pdocrud->colRename("idUsuario", "Usuario");
             $pdocrud->fieldRenameLable("idPeligroAlimento", "Recomendacion");//Rename label
+            $pdocrud->crudRemoveCol(array("denuncia", "alimentoFront", "alimentoNutr", "alimentoIngr"));
             $todos = $pdocrud->dbTable("alimentos");
             $data['alimentos'] = $todos;
             $data['rateit'] = $pdocrud->loadPluginJsCode("rateit",".rateit");
@@ -126,6 +137,8 @@ class Alimentos extends CI_Controller {
             $subTitleContent = "Administracion de Alimentos";
             $level = "Alimentos";
             $pdocrud->where("alimentoFront", "1","=");
+            $pdocrud->where("alimentoIngr", "1", "=", "OR");
+            $pdocrud->where("alimentoNutr", "1", "=", "OR");
             $pdocrud->relatedData("idUsuario", "usuarios", "idUsuario", "correo");
             $pdocrud->tableColFormatting("alimentoFront", "replace",array("1" =>"Pendiente"));
             $pdocrud->tableColFormatting("alimentoIngr", "replace",array("1" =>"Pendiente"));
@@ -144,11 +157,31 @@ class Alimentos extends CI_Controller {
             $pdocrud->enqueueBtnActions("url", $action, "url",$text,"alimentoOthr", $attr);
             //$pdocrud->where("alimentoOthr", "1","=");
             $imagenes = $pdocrud->dbTable("alimento_nuevo");
-            
+            $pdocrud2 = $this->cabecera();
+            $pdocrud2->crudTableCol(array("idUsuario","codigoBarras", "nombreAlimento", "alimentoFront", "alimentoIngr", "alimentoNutr"));
+            $pdocrud2->where("alimentoFront", "1","=");
+            $pdocrud2->where("alimentoIngr", "1", "=", "OR");
+            $pdocrud2->where("alimentoNutr", "1", "=", "OR");
+            $pdocrud2->relatedData("idUsuario", "usuarios", "idUsuario", "correo");
+            $pdocrud2->tableColFormatting("alimentoFront", "replace",array("1" =>"Pendiente"));
+            $pdocrud2->tableColFormatting("alimentoIngr", "replace",array("1" =>"Pendiente"));
+            $pdocrud2->tableColFormatting("alimentoNutr", "replace",array("1" =>"Pendiente"));
+            $pdocrud2->tableColFormatting("alimentoFront", "replace",array("0" =>""));
+            $pdocrud2->tableColFormatting("alimentoIngr", "replace",array("0" =>""));
+            $pdocrud2->tableColFormatting("alimentoNutr", "replace",array("0" =>""));
+            $pdocrud2->setSettings("viewbtn", false);
+            $pdocrud2->setSettings("editbtn", false);
+            $pdocrud2->setSettings("delbtn", false);
+            $action = base_url()."Alimentos/verAlimentoImagenesApr/{pk}";//pk will be replaced by primary key value
+            $text = '<i class="fa fa-eye" aria-hidden="true"></i>';
+            $attr = array("title"=>"Ver");
+            $pdocrud2->enqueueBtnActions("url", $action, "url",$text,"alimentoNutr", $attr);
+            $imagenes2 = $pdocrud2->dbTable("alimentos");
             $data['alimentos'] = $imagenes;
+            $data['alimentos2'] = $imagenes2;
             $data['rateit'] = NULL;
             //$data['alimentos'] = $result;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "imagenesPendientes", $data);
         } else {
             $this->load->view('403');
         }
@@ -245,6 +278,8 @@ class Alimentos extends CI_Controller {
                 //Insertar en Alimentos
                 $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]);
                 $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
+                $insertData2 = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "fechaEscaneo" => $ind["date"]);
+                $pdocrud->getPDOModelObj()->insert("historial_escaneo", $insertData2);
                 //$this->images($ind["codigoBarras"]);
                 redirect('/Alimentos/pendientes/');
             }else{
@@ -345,9 +380,9 @@ class Alimentos extends CI_Controller {
             $data['alimento2'] = $alimento2;
             $data['alimento3'] = $alimento3;
             $data['ind'] = $alimento_ind;
-            $imgFront = $this->urlImageRemote."front/".$alimento_ind['codigoBarras'].".jpg";
-            $imgIngr = $this->urlImageRemote."ingredients/".$alimento_ind['codigoBarras'].".jpg";
-            $imgNutr = $this->urlImageRemote."nutrition/".$alimento_ind['codigoBarras'].".jpg";
+            $imgFront = $this->urlImageRemote."2"."/front/".$alimento_ind['codigoBarras'].".jpg";
+            $imgIngr = $this->urlImageRemote."2"."/ingredients/".$alimento_ind['codigoBarras'].".jpg";
+            $imgNutr = $this->urlImageRemote."2"."/nutrition/".$alimento_ind['codigoBarras'].".jpg";
             if ($alimento_ind['alimentoFront']=="1"){
                 $data['front'] = $imgFront;
             }else{
@@ -471,6 +506,310 @@ class Alimentos extends CI_Controller {
                    break;
             }
             redirect('/Alimentos/verAlimentoImagenes/'.$alimento_ind["idAlimentoNuevo"]);
+        }else{
+            $this->load->view('403');
+        }
+    }
+    
+    function aprobarImg2($codigo, $imgType){
+        $pdocrud = $this->cabecera();
+        $pdomodel = $pdocrud->getPDOModelObj();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+            $pdomodel->where("codigoBarras", $codigo);
+            $obj =  $pdomodel->select("alimentos");
+            $alimento_ind = $obj[0];
+            $base_url = dirname(dirname(dirname(__FILE__)))."/temps";
+            $fields = array(
+                    "user_id"                           => "eyesfood",
+                    "password"                          => "eyesfood2019",
+                    "code"                              => $alimento_ind["codigoBarras"],
+              );
+            switch ($imgType){
+                case "front":
+                    $base_url = $base_url."/front/".$alimento_ind["codigoBarras"].".jpg";
+                    //echo $base_url."\n";
+                    //echo $this->urlImageRemote.'/front/'.$alimento_ind["codigoBarras"].'.jpg';
+                    copy($this->urlImageRemote."1".'/front/'.$alimento_ind["codigoBarras"].'.jpg', $base_url);
+                    $image = new CURLFile($base_url, "image/png", "front.png");
+                    $fields2 = array(
+                    "imagefield"                              => "front",
+                    "imgupload_front"                              => $image,
+                    );
+                    $fields = array_merge($fields, $fields2);
+                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $response = json_decode($make_call, true);
+                    if ($response['status']=="status ok"){
+                        echo 'Exito';
+                        $updateData = array("alimentoFront"=>"0");
+                        $pdomodel = $pdocrud->getPDOModelObj();
+                        $pdomodel->where("codigoBarras", $codigo);
+                        $pdomodel->update("alimentos", $updateData);
+                    }elseif ($response['status']=="status not ok"){
+                        if ($response['imgid']==-3) {
+                            $updateData = array("alimentoFront"=>"0");
+                            $pdomodel = $pdocrud->getPDOModelObj();
+                            $pdomodel->where("codigoBarras", $codigo);
+                            $pdomodel->update("alimentos", $updateData);
+                        }
+                    }else{
+                        
+                    }
+                   break;
+                case "ingr":
+                    $base_url = $base_url."/ingredients/".$alimento_ind["codigoBarras"].".jpg";
+                    copy($this->urlImageRemote."1".'/ingredients/'.$alimento_ind["codigoBarras"].'.jpg', $base_url);
+                    $image = new CURLFile($base_url, "image/png", "ingredients.png");
+                    $fields2 = array(
+                    "imagefield"                              => "ingredients",
+                    "imgupload_ingredients"                              => $image,
+                    );
+                    $fields = array_merge($fields, $fields2);
+                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $response = json_decode($make_call, true);
+                    if ($response['status']=="status ok"){
+                        echo 'Exito';
+                        $updateData = array("alimentoIngr"=>"0");
+                        $pdomodel = $pdocrud->getPDOModelObj();
+                        $pdomodel->where("codigoBarras", $codigo);
+                        $pdomodel->update("alimentos", $updateData);
+                    }elseif ($response['status']=="status not ok"){
+                        if ($response['imgid']==-3) {
+                            $updateData = array("alimentoIngr"=>"0");
+                            $pdomodel = $pdocrud->getPDOModelObj();
+                            $pdomodel->where("codigoBarras", $codigo);
+                            $pdomodel->update("alimentos", $updateData);
+                        }
+                    }else{
+                        
+                    }
+                   break;
+                default:
+                    $base_url = $base_url."/nutrition/".$alimento_ind["codigoBarras"].".jpg";
+                    copy($this->urlImageRemote."1".'/nutrition/'.$alimento_ind["codigoBarras"].'.jpg', $base_url);
+                    $image = new CURLFile($base_url, "image/png", "nutrition.png");
+                    $fields2 = array(
+                    "imagefield"                              => "nutrition",
+                    "imgupload_nutrition"                              => $image,
+                    );
+                    $fields = array_merge($fields, $fields2);
+                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $response = json_decode($make_call, true);
+                    if ($response['status']=="status ok"){
+                        echo 'Exito';
+                        $updateData = array("alimentoNutr"=>"0");
+                        $pdomodel = $pdocrud->getPDOModelObj();
+                        $pdomodel->where("codigoBarras", $codigo);
+                        $pdomodel->update("alimentos", $updateData);
+                    }elseif ($response['status']=="status not ok"){
+                        if ($response['imgid']==-3) {
+                            $updateData = array("alimentoNutr"=>"0");
+                            $pdomodel = $pdocrud->getPDOModelObj();
+                            $pdomodel->where("codigoBarras", $codigo);
+                            $pdomodel->update("alimentos", $updateData);
+                        }
+                    }else{
+                        
+                    }
+                   break;
+            }
+            redirect('/Alimentos/verAlimentoImagenesApr/'.$alimento_ind["codigoBarras"]);
+        }else{
+            $this->load->view('403');
+        }
+    }
+    
+    public function verAlimentoImagenesApr($codigo) {
+        $pdocrud = $this->cabecera();
+        $pdomodel = $pdocrud->getPDOModelObj();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+            $curl = curl_init();
+            // Set some options - we are passing in a useragent too here
+            curl_setopt_array($curl, [
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_URL => $this->urlGet.$codigo,
+            ]);
+            // Send the request & save response to $resp
+            $resp = json_decode(curl_exec($curl), true); 
+            // Close request to clear up some resources
+            curl_close($curl);
+            $product = $resp["product"];
+            $nutriments = $product["nutriments"];
+            
+            $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
+            $username = $pdocrud->getUserSession("userName");
+            $titleContent = "Alimento";
+            $subTitleContent = "Administracion de Alimento";
+            $level = "Alimento";
+            $pdocrud->setPK("codigoBarras");
+            $pdocrud->where("codigoBarras", $codigo,"=");
+            $pdocrud->setViewColumns(array("codigoBarras", "nombreAlimento"));
+            $alimento = $pdocrud->dbTable("alimentos")->render("VIEWFORM",array("id" =>$codigo));
+            
+            $pdomodel->where("codigoBarras", $codigo);
+            $obj =  $pdomodel->select("alimentos");
+            $alimento_ind = $obj[0];
+            
+//            $data['alimento'] = $alimento;
+//            $data['alimento2'] = $alimento2;
+//            $data['alimento3'] = $alimento3;
+            $data['ind'] = $alimento_ind;
+            $data['resp'] = $resp;
+            $data['prod'] = $product;
+            $data['ind'] = $alimento_ind;
+            //$data['rend'] = $rend;
+            $data['alimento'] = $alimento;
+            $imgFront = $this->urlImageRemote."1"."/front/".$alimento_ind['codigoBarras'].".jpg";
+            $imgIngr = $this->urlImageRemote."1"."/ingredients/".$alimento_ind['codigoBarras'].".jpg";
+            $imgNutr = $this->urlImageRemote."1"."/nutrition/".$alimento_ind['codigoBarras'].".jpg";
+            if ($alimento_ind['alimentoFront']=="1"){
+                $data['front'] = $imgFront;
+            }else{
+                $data['front'] = NULL;
+            }
+            if ($alimento_ind['alimentoIngr']=="1"){
+                $data['ingr'] = $imgIngr;
+            }else{
+                $data['ingr'] = NULL;
+            }
+            if ($alimento_ind['alimentoNutr']=="1"){
+                $data['nutr'] = $imgNutr;
+            }else{
+                $data['nutr'] = NULL;
+            }
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentoImagenApr", $data);
+        }else{
+             $this->load->view('403');
+        }
+    }
+    
+    public function comentarios($codigo) {
+        $pdocrud = $this->cabecera();
+        $pdomodel = $pdocrud->getPDOModelObj();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+            $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
+            $username = $pdocrud->getUserSession("userName");
+            $titleContent = "Comentarios";
+            $subTitleContent = "Administracion de Alimento";
+            $level = "Comentarios";
+            $curl = curl_init();
+            // Set some options - we are passing in a useragent too here
+            curl_setopt_array($curl, [
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_URL => $this->
+                    urlApiComments."comments/".$codigo,
+                CURLOPT_USERAGENT => 'EyesFood'
+            ]);
+            // Send the request & save response to $resp
+            $resp = curl_exec($curl);
+            curl_setopt_array($curl, [
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_URL => $this->
+                    urlGet.$codigo,
+                CURLOPT_USERAGENT => 'OpenFoodFacts'
+            ]);
+            $resp2 = curl_exec($curl);
+            $response = json_decode($resp2, true);
+            $comentarios = json_decode($resp, true);
+            for($i = 0, $size = count($comentarios); $i < $size; ++$i) {
+                $usuario = $this->correo($comentarios[$i]['idUsuario']);
+                array_push($comentarios[$i], $usuario['Correo']);
+//                    $people[$i]['salt'] = mt_rand(000000, 999999);
+            }
+            // Close request to clear up some resources
+            curl_close($curl);
+            $pdocrud->setPK("codigoBarras");
+            $pdocrud->where("codigoBarras", $codigo,"=");
+            $pdocrud->setViewColumns(array("codigoBarras", "nombreAlimento","idUsuario","fechaSubida", "denuncia"));
+            $pdocrud->setSettings("viewBackButton", false);
+            $pdocrud->setSettings("viewPrintButton", false);
+            $alimento = $pdocrud->dbTable("alimentos")->render("VIEWFORM",array("id" =>$codigo)); 
+            $data['comentarios'] = $comentarios;
+            $data['response'] = $response['product']['image_front_url'];
+            $data['alimento'] = $alimento;
+            $data['codigo'] = $codigo;
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "comentarios", $data);
+        }else{
+             $this->load->view('403');
+        }
+    }
+    
+    public function correo($codigo) {
+        $pdocrud = $this->cabecera();
+        $pdomodel = $pdocrud->getPDOModelObj();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+            $pdomodel->where("idUsuario", $codigo);
+            $obj =  $pdomodel->select("usuarios");
+            $usuario = $obj[0];
+            return $usuario;
+        }else{
+            $this->load->view('403');
+        }
+        
+    }
+    
+    public function borraComentario($codigo){
+        echo $codigo;
+    }
+    
+    public function comentar($codigo, $comentario){
+        $pdocrud = $this->cabecera();
+        $pdomodel = $pdocrud->getPDOModelObj();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+            echo $codigo;
+            echo $comentario;
+            echo $pdocrud->getUserSession("userId");
+            $data_array =  array(
+                    "idUsuario"        => $pdocrud->getUserSession("userId"),
+                    "comentario"        => urldecode ( $comentario ),
+              );
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data_array));
+            curl_setopt($curl, CURLOPT_URL, $this->urlApiComments.'comments/'.$codigo);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            $result = curl_exec($curl);
+            curl_close($curl);
+            redirect('/Alimentos/comentarios/'.$codigo);
+        }else{
+            $this->load->view('403');
+        }
+    }
+    
+    public function recomendaciones($codigo){
+        $pdocrud = $this->cabecera();
+        $pdocrud2 = $this->cabecera();
+        $pdomodel = $pdocrud->getPDOModelObj();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+            $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
+            $username = $pdocrud->getUserSession("userName");
+            $titleContent = "Recomendaciones";
+            $subTitleContent = "Administracion de Recomendaciones";
+            $level = "Recomendaciones";
+            $pdocrud->setPK("codigoBarras");
+            $pdocrud->where("codigoBarras", $codigo,"=");
+            $pdocrud->setViewColumns(array("codigoBarras", "nombreAlimento","idUsuario","fechaSubida", "denuncia"));
+            $pdocrud->setSettings("viewBackButton", false);
+            $pdocrud->setSettings("viewPrintButton", false);
+            $alimento = $pdocrud->dbTable("alimentos")->render("VIEWFORM",array("id" =>$codigo));
+            $data['alimento'] = $alimento;
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_URL => $this->
+                    urlGet.$codigo,
+                CURLOPT_USERAGENT => 'OpenFoodFacts'
+            ]);
+            $resp2 = curl_exec($curl);
+            $response = json_decode($resp2, true);
+            
+            $pdocrud2->where("codigoBarras", $codigo, "=");
+            $pdocrud2->formFieldValue("codigoBarras", trim($codigo));
+            $pdocrud2->relatedData("idRecomendacion", "recomendaciones", "idRecomendacion", "recomendacion");
+            $pdocrud2->crudRemoveCol(array("idAlimentoRecomendacion", "codigoBarras"));
+            $recomendaciones = $pdocrud2->dbTable("alimento_recomendacion")->render();
+            $data['response'] = $response['product']['image_front_url'];
+            $data['recomendaciones'] = $recomendaciones;
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "recomendacionesAlimento", $data);
         }else{
             $this->load->view('403');
         }

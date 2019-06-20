@@ -105,6 +105,8 @@
                                 </li>
                                 <li><a href="<?php echo base_url();?>Alimentos/imagenes"><i class="fa fa-image"></i> <span>Imagenes</span></a></li>
                                 <li><a href="<?php echo base_url();?>Alimentos/todos"><i class="fa fa-list"></i> <span>Todos</span></a></li>
+                                <li><a href="<?php echo base_url();?>Recomendaciones/index"><i class="fa fa-medkit"></i> <span>Recomendaciones</span></a></li>
+                                <li><a href="<?php echo base_url();?>Peligros/index"><i class="fa fa-exclamation-triangle"></i> <span>Peligros</span></a></li>
                             </ul>
                         </li>
                         <li><a href="<?php echo base_url();?>Expertos"><i class="fa fa-user-md"></i> <span>Expertos</span></a></li>
