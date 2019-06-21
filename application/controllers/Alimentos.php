@@ -1,9 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Alimentos extends CI_Controller {
-    public $url = 'https://cl.openfoodfacts.net/cgi/product_jqm2.pl';
+    public $urlPost = 'https://cl.openfoodfacts.net/cgi/product_jqm2.pl';
     public $urlGet = 'https://cl.openfoodfacts.org/api/v0/product/';
-    public $urlImage = 'https://cl.openfoodfacts.net/cgi/product_image_upload.pl';
+    public $urlImagePost = 'https://cl.openfoodfacts.net/cgi/product_image_upload.pl';
     public $urlImageRemote = 'http://localhost/api.eyesfood.cl/v1/img/uploads/';
     public $urlApiComments = 'http://localhost/api.eyesfood.comments.cl/v1/';
     //public $base_dir = __DIR__."/temps/";
@@ -13,9 +13,10 @@ class Alimentos extends CI_Controller {
 
     public function aceptados(){
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimentos Subidos Aceptados";
             $subTitleContent = "Administracion de Alimentos";
             $level = "Alimentos";
@@ -23,14 +24,19 @@ class Alimentos extends CI_Controller {
             $pdocrud->fieldRenameLable("idUsuario", "Usuario");//Rename label
             $pdocrud->relatedData("idUsuario", "usuarios", "idUsuario", "correo");
             $pdocrud->tableColFormatting("estadoAlimento", "replace",array("1" =>"Aceptado"));
-            $action = "https://cl.openfoodfacts.net/producto/{pk}";//pk will be replaced by primary key value
-            $text = '<i class="fa fa-external-link" aria-hidden="true"></i>';
-            $attr = array("title"=>"Abrir en OpenFoodFacts");
-            $pdocrud->enqueueBtnActions("url", $action, "url",$text,"estadoAlimento", $attr);
+//            $action = "https://cl.openfoodfacts.net/producto/{pk}";//pk will be replaced by primary key value
+//            $text = '<i class="fa fa-external-link" aria-hidden="true"></i>';
+//            $attr = array("title"=>"Abrir en OpenFoodFacts");
+//            $pdocrud->enqueueBtnActions("url", $action, "url",$text,"estadoAlimento", $attr);
+            if ($rol==2) {
+//                $pdocrud->setSettings("viewbtn", false);
+                $pdocrud->setSettings("editbtn", false);
+                $pdocrud->setSettings("delbtn", false);
+            }
             $aceptados = $pdocrud->dbTable("alimento_nuevo");
             $data['alimentos'] = $aceptados;
             $data['rateit'] = NULL;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -38,9 +44,11 @@ class Alimentos extends CI_Controller {
     
     public function pendientes(){
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
+            $pdocrud->crudTableCol(array("idUsuario","codigoBarras", "nombreAlimento", "producto", "marca", "contenidoNeto", "ingredientes"));
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimentos Subidos Pendientes";
             $subTitleContent = "Administracion de Alimentos";
             $level = "Alimentos";
@@ -53,10 +61,16 @@ class Alimentos extends CI_Controller {
             $text = '<i class="fa fa-eye" aria-hidden="true"></i>';
             $attr = array("title"=>"Ver");
             $pdocrud->enqueueBtnActions("url", $action, "url",$text,"estadoAlimento", $attr);
+            if ($rol==2) {
+//                $pdocrud->setSettings("viewbtn", false);
+                $pdocrud->setSettings("editbtn", false);
+                $pdocrud->setSettings("delbtn", false);
+                $pdocrud->setSettings("addbtn", false);
+            }
             $pendientes = $pdocrud->dbTable("alimento_nuevo");
             $data['alimentos'] = $pendientes;
             $data['rateit'] = NULL;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -64,9 +78,10 @@ class Alimentos extends CI_Controller {
     
     public function rechazados() {
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimentos Subidos Rechazados";
             $subTitleContent = "Administracion de Alimentos";
             $level = "Alimentos";
@@ -79,10 +94,15 @@ class Alimentos extends CI_Controller {
             $text = '<i class="fa fa-eye" aria-hidden="true"></i>';
             $attr = array("title"=>"Ver");
             $pdocrud->enqueueBtnActions("url", $action, "url",$text,"estadoAlimento", $attr);
+            if ($rol==2) {
+//                $pdocrud->setSettings("viewbtn", false);
+                $pdocrud->setSettings("editbtn", false);
+                $pdocrud->setSettings("delbtn", false);
+            }
             $rechazados = $pdocrud->dbTable("alimento_nuevo");
             $data['alimentos'] = $rechazados;
             $data['rateit'] = NULL;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -90,9 +110,10 @@ class Alimentos extends CI_Controller {
     
     public function todos(){
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0","2"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimentos";
             $subTitleContent = "Administracion de Alimentos";
             $level = "Alimentos";
@@ -100,7 +121,7 @@ class Alimentos extends CI_Controller {
             $pdocrud->fieldTypes("peligroAlimento", "rateit");
             $pdocrud->tableColFormatting("peligroAlimento", "rateit");
             $pdocrud->viewColFormatting("peligroAlimento", "rateit");
-            $action = "https://cl.openfoodfacts.net/producto/{codigoBarras}";//pk will be replaced by primary key value
+            $action = "https://cl.openfoodfacts.org/producto/{codigoBarras}";//pk will be replaced by primary key value
             $text = '<i class="fa fa-external-link" aria-hidden="true"></i>';
             $attr = array("title"=>"Abrir en OpenFoodFacts");
             $pdocrud->enqueueBtnActions("url", $action, "url",$text,"denuncia", $attr);
@@ -116,12 +137,21 @@ class Alimentos extends CI_Controller {
             $pdocrud->relatedData("idUsuario", "usuarios", "idUsuario", "correo");
             $pdocrud->fieldRenameLable("idUsuario", "Usuario");//Rename label
             $pdocrud->colRename("idUsuario", "Usuario");
-            $pdocrud->fieldRenameLable("idPeligroAlimento", "Recomendacion");//Rename label
+            $pdocrud->fieldRenameLable("idPeligroAlimento", "Peligro");//Rename label
             $pdocrud->crudRemoveCol(array("denuncia", "alimentoFront", "alimentoNutr", "alimentoIngr"));
+            if ($rol==2) {
+                $pdocrud->setSettings("viewbtn", false);
+                //$pdocrud->setSettings("editbtn", false);
+                $pdocrud->setSettings("delbtn", false);
+                $pdocrud->setSettings("addbtn", false);
+                $pdocrud->formFields(array("idPeligroAlimento","peligroAlimento","indiceGlicemico"));
+            }else{
+                
+            }
             $todos = $pdocrud->dbTable("alimentos");
             $data['alimentos'] = $todos;
             $data['rateit'] = $pdocrud->loadPluginJsCode("rateit",".rateit");
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentos", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -129,10 +159,11 @@ class Alimentos extends CI_Controller {
     
     public function imagenes(){
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $pdocrud->crudTableCol(array("idAlimentoNuevo","idUsuario","codigoBarras", "nombreAlimento", "alimentoFront", "alimentoIngr", "alimentoNutr", "alimentoOthr"));
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimentos con imagenes pendientes de revision";
             $subTitleContent = "Administracion de Alimentos";
             $level = "Alimentos";
@@ -181,7 +212,7 @@ class Alimentos extends CI_Controller {
             $data['alimentos2'] = $imagenes2;
             $data['rateit'] = NULL;
             //$data['alimentos'] = $result;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "imagenesPendientes", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "imagenesPendientes", $data, $rol);
         } else {
             $this->load->view('403');
         }
@@ -190,23 +221,32 @@ class Alimentos extends CI_Controller {
     public function verAlimento($id) {
         $pdocrud = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimento";
             $subTitleContent = "Administracion de Alimento";
             $level = "Alimento";
+            //$pdocrud->relatedData("idUsuario", "usuarios", "idUsuario", "correo");
             $pdocrud->setPK("idAlimentoNuevo");
             $pdocrud->where("idAlimentoNuevo", $id,"=");
-            $pdocrud->setSettings("inlineEditbtn", true);
-            //$alimento = $pdocrud->dbTable("alimento_nuevo");
+            $pdocrud->FormSteps(array("idUsuario","nombreAlimento", "producto", "marca", "contenidoNeto", "ingredientes"), "Información General","tabs");
+            $pdocrud->FormSteps(array("porcion","porcionGramos","energia","proteinas","grasaTotal"), "1","tabs");
+            $pdocrud->FormSteps(array("grasaSaturada","grasaMono","grasaPoli","grasaTrans","colesterol"), "2","tabs");
+            $pdocrud->FormSteps(array("hidratosCarbono","azucaresTotales","fibra","sodio"), "3","tabs");
+            $pdocrud->setSettings("viewBackButton", false);
+            $pdocrud->setSettings("viewPrintButton", false);
+            $pdocrud->setPK("idAlimentoNuevo");
+            $pdocrud->setSettings("viewFormTabs", true);//set view form tabs enabled
+             //$alimento = $pdocrud->dbTable("alimento_nuevo");
             $alimento = $pdocrud->dbTable("alimento_nuevo")->render("VIEWFORM",array("id" =>$id)); 
             $pdomodel->where("idAlimentoNuevo", $id);
             $obj =  $pdomodel->select("alimento_nuevo");
             $alimento_ind = $obj[0];
             $data['alimento'] = $alimento;
             $data['ind'] = $alimento_ind;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimento", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimento", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -218,19 +258,20 @@ class Alimentos extends CI_Controller {
         return $pdocrud = new PDOCrud();
     }
     
-    public function template($title, $username, $nombreApellido, $titleContent, $subTitleContent, $level, $pagina ,$data){
+    public function template($title, $username, $nombreApellido, $titleContent, $subTitleContent, $level, $pagina ,$data, $rol){
         $this->template->set('title', $title);
         $this->template->set('username', $username);
         $this->template->set('nombreApellido', $nombreApellido);
         $this->template->set('titleContent', $titleContent);
         $this->template->set('subTitleContent', $subTitleContent);
         $this->template->set('level', $level);
+        $this->template->set('rol', $rol);
         $this->template->load('default_layout', 'contents' , $pagina, $data);
     }
     
     public function aprobar($id){
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "1"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0","2"))){
 //            $updateData = array("estadoAlimento"=>"3");
 //            $pdomodel = $pdocrud->getPDOModelObj();
 //            $pdomodel->where("idAlimentoNuevo", $id);
@@ -267,7 +308,7 @@ class Alimentos extends CI_Controller {
                     "ingredients_text"                  => $ind["ingredientes"],
               );
             //echo http_build_query($data_array) . "\n";
-            $make_call = $this->callAPI("GET", $this->url, $data_array);
+            $make_call = $this->callAPI("GET", $this->urlPost, $data_array);
             $response = json_decode($make_call, true);
             if ($response['status']=="1"){
                 //echo 'guardado';
@@ -293,7 +334,7 @@ class Alimentos extends CI_Controller {
     
     public function rechazar($id){
         $pdocrud = $this->cabecera();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "1"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $updateData = array("estadoAlimento"=>"3");
             $pdomodel = $pdocrud->getPDOModelObj();
             $pdomodel->where("idAlimentoNuevo", $id);
@@ -407,7 +448,7 @@ class Alimentos extends CI_Controller {
     function aprobarImg($id, $imgType){
         $pdocrud = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $pdomodel->where("idAlimentoNuevo", $id);
             $obj =  $pdomodel->select("alimento_nuevo");
             $alimento_ind = $obj[0];
@@ -429,7 +470,7 @@ class Alimentos extends CI_Controller {
                     "imgupload_front"                              => $image,
                     );
                     $fields = array_merge($fields, $fields2);
-                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $make_call = $this->callAPI("POST", $this->urlImagePost, $fields);
                     $response = json_decode($make_call, true);
                     if ($response['status']=="status ok"){
                         echo 'Exito';
@@ -457,7 +498,7 @@ class Alimentos extends CI_Controller {
                     "imgupload_ingredients"                              => $image,
                     );
                     $fields = array_merge($fields, $fields2);
-                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $make_call = $this->callAPI("POST", $this->urlImagePost, $fields);
                     $response = json_decode($make_call, true);
                     if ($response['status']=="status ok"){
                         echo 'Exito';
@@ -485,7 +526,7 @@ class Alimentos extends CI_Controller {
                     "imgupload_nutrition"                              => $image,
                     );
                     $fields = array_merge($fields, $fields2);
-                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $make_call = $this->callAPI("POST", $this->urlImagePost, $fields);
                     $response = json_decode($make_call, true);
                     if ($response['status']=="status ok"){
                         echo 'Exito';
@@ -536,7 +577,7 @@ class Alimentos extends CI_Controller {
                     "imgupload_front"                              => $image,
                     );
                     $fields = array_merge($fields, $fields2);
-                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $make_call = $this->callAPI("POST", $this->urlImagePost, $fields);
                     $response = json_decode($make_call, true);
                     if ($response['status']=="status ok"){
                         echo 'Exito';
@@ -564,7 +605,7 @@ class Alimentos extends CI_Controller {
                     "imgupload_ingredients"                              => $image,
                     );
                     $fields = array_merge($fields, $fields2);
-                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $make_call = $this->callAPI("POST", $this->urlImagePost, $fields);
                     $response = json_decode($make_call, true);
                     if ($response['status']=="status ok"){
                         echo 'Exito';
@@ -592,7 +633,7 @@ class Alimentos extends CI_Controller {
                     "imgupload_nutrition"                              => $image,
                     );
                     $fields = array_merge($fields, $fields2);
-                    $make_call = $this->callAPI("POST", $this->urlImage, $fields);
+                    $make_call = $this->callAPI("POST", $this->urlImagePost, $fields);
                     $response = json_decode($make_call, true);
                     if ($response['status']=="status ok"){
                         echo 'Exito';
@@ -621,7 +662,7 @@ class Alimentos extends CI_Controller {
     public function verAlimentoImagenesApr($codigo) {
         $pdocrud = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $curl = curl_init();
             // Set some options - we are passing in a useragent too here
             curl_setopt_array($curl, [
@@ -637,6 +678,7 @@ class Alimentos extends CI_Controller {
             
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Alimento";
             $subTitleContent = "Administracion de Alimento";
             $level = "Alimento";
@@ -676,7 +718,7 @@ class Alimentos extends CI_Controller {
             }else{
                 $data['nutr'] = NULL;
             }
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentoImagenApr", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "alimentoImagenApr", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -685,9 +727,10 @@ class Alimentos extends CI_Controller {
     public function comentarios($codigo) {
         $pdocrud = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Comentarios";
             $subTitleContent = "Administracion de Alimento";
             $level = "Comentarios";
@@ -727,7 +770,7 @@ class Alimentos extends CI_Controller {
             $data['response'] = $response['product']['image_front_url'];
             $data['alimento'] = $alimento;
             $data['codigo'] = $codigo;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "comentarios", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "comentarios", $data, $rol);
         }else{
              $this->load->view('403');
         }
@@ -736,7 +779,7 @@ class Alimentos extends CI_Controller {
     public function correo($codigo) {
         $pdocrud = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $pdomodel->where("idUsuario", $codigo);
             $obj =  $pdomodel->select("usuarios");
             $usuario = $obj[0];
@@ -754,7 +797,7 @@ class Alimentos extends CI_Controller {
     public function comentar($codigo, $comentario){
         $pdocrud = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0","2"))){
             echo $codigo;
             echo $comentario;
             echo $pdocrud->getUserSession("userId");
@@ -779,9 +822,10 @@ class Alimentos extends CI_Controller {
         $pdocrud = $this->cabecera();
         $pdocrud2 = $this->cabecera();
         $pdomodel = $pdocrud->getPDOModelObj();
-        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0", "2"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Recomendaciones";
             $subTitleContent = "Administracion de Recomendaciones";
             $level = "Recomendaciones";
@@ -801,15 +845,16 @@ class Alimentos extends CI_Controller {
             ]);
             $resp2 = curl_exec($curl);
             $response = json_decode($resp2, true);
-            
             $pdocrud2->where("codigoBarras", $codigo, "=");
             $pdocrud2->formFieldValue("codigoBarras", trim($codigo));
             $pdocrud2->relatedData("idRecomendacion", "recomendaciones", "idRecomendacion", "recomendacion");
             $pdocrud2->crudRemoveCol(array("idAlimentoRecomendacion", "codigoBarras"));
+            $pdocrud2->setSettings("viewbtn", false);
+            $pdocrud2->setSettings("editbtn", false);
             $recomendaciones = $pdocrud2->dbTable("alimento_recomendacion")->render();
             $data['response'] = $response['product']['image_front_url'];
             $data['recomendaciones'] = $recomendaciones;
-            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "recomendacionesAlimento", $data);
+            $this->template("Alimentos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "recomendacionesAlimento", $data, $rol);
         }else{
             $this->load->view('403');
         }

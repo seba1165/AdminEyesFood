@@ -55,7 +55,7 @@
                     <!-- Sidebar user panel (optional) -->
                     <div class="user-panel">
                       <div class="pull-left image">
-                          <img src="<?php echo base_url();?>dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                          <img src="<?php echo base_url();?>dist/img/default-user.png" class="img-circle" alt="User Image">
                       </div>
                       <div class="pull-left info">
                           <p>
@@ -72,7 +72,9 @@
                     <ul class="sidebar-menu">
                       <li class="header">MENU</li>
                       <!-- Optionally, you can add icons to the links -->
-                        <li class=""><a href="<?php echo base_url();?>Usuarios"><i class="fa fa-users"></i> <span>Usuarios</span></a></li>
+                      <li class="" <?php if ($rol != 0){ echo 'style="display:none;"'; } ?>>
+                            <a href="<?php echo base_url();?>Usuarios"><i class="fa fa-users"></i> <span>Usuarios</span></a>
+                        </li>
                         <li class="treeview">
                             <a href="#">
                                 <i class="fa fa-apple"></i> <span>Alimentos</span>
@@ -81,6 +83,7 @@
                                 </span>
                             </a>
                             <ul class="treeview-menu">
+                                <li><a href="<?php echo base_url();?>Alimentos/todos"><i class="fa fa-list"></i> <span>Todos</span></a></li>
                                 <li class="treeview">
                                   <a href="#"><i class="fa fa-upload"></i> Subidos
                                     <span class="pull-right-container">
@@ -88,7 +91,7 @@
                                     </span>
                                   </a>
                                   <ul class="treeview-menu">
-                                    <li><a href="<?php echo base_url();?>Alimentos/aceptados"><i class="fa fa-check"></i> Aceptados</a></li>
+                                    <!--<li><a href="<?php echo base_url();?>Alimentos/aceptados"><i class="fa fa-check"></i> Aceptados</a></li>-->
                                     <li><a href="<?php echo base_url();?>Alimentos/pendientes"><i class="fa fa-hourglass-start"></i> Pendientes</a></li>
                                     <li><a href="<?php echo base_url();?>Alimentos/rechazados"><i class="fa fa-times"></i> Rechazados</a></li>
                                   </ul>
@@ -104,12 +107,11 @@
                                   </ul>
                                 </li>
                                 <li><a href="<?php echo base_url();?>Alimentos/imagenes"><i class="fa fa-image"></i> <span>Imagenes</span></a></li>
-                                <li><a href="<?php echo base_url();?>Alimentos/todos"><i class="fa fa-list"></i> <span>Todos</span></a></li>
                                 <li><a href="<?php echo base_url();?>Recomendaciones/index"><i class="fa fa-medkit"></i> <span>Recomendaciones</span></a></li>
                                 <li><a href="<?php echo base_url();?>Peligros/index"><i class="fa fa-exclamation-triangle"></i> <span>Peligros</span></a></li>
                             </ul>
                         </li>
-                        <li><a href="<?php echo base_url();?>Expertos"><i class="fa fa-user-md"></i> <span>Expertos</span></a></li>
+                        <li <?php if ($rol != 0){ echo 'style="display:none;"'; } ?>><a href="<?php echo base_url();?>Expertos"><i class="fa fa-user-md"></i> <span>Expertos</span></a></li>
                     </ul><!-- /.sidebar-menu -->    
                 </section>
                 <!-- /.sidebar -->

@@ -26,6 +26,12 @@ function beforeloginCallback($data, $obj) {
     $data["usuarios"]["hash_password"] = sha1($data["usuarios"]["hash_password"]);
     return $data;
 }
+
+function beforeloginCallback2($data, $obj) {  
+    //do something like if your passwords are md5 encrypted then change the value
+    $data["expertos"]["hash_password"] = sha1($data["expertos"]["hash_password"]);
+    return $data;
+}
  
 function afterLoginCallBack($data, $obj) {
     @session_start();
@@ -33,6 +39,19 @@ function afterLoginCallBack($data, $obj) {
     //save data in session
         $_SESSION["data"] = $data;
         $obj->formRedirection("http://localhost/AdminEyesFood/Usuarios/index");
+    }
+    else{
+        //no record found so don't redirect
+        $obj->formRedirection("");
+    }
+}
+
+function afterLoginCallBack2($data, $obj) {
+    @session_start();
+    if (count($data)) {
+    //save data in session
+        $_SESSION["data"] = $data;
+        $obj->formRedirection("http://localhost/AdminEyesFood/Alimentos/todos");
     }
     else{
         //no record found so don't redirect

@@ -15,20 +15,19 @@ class Usuarios extends CI_Controller {
             $pdocrud->fieldTypes("Sexo", "radio");//change gender to radio button
             $pdocrud->fieldDataBinding("Sexo", array("M","F"), "", "","array");//add data for radio button
             $pdocrud->fieldTypes("rol", "radio");//change gender to radio button
-            $pdocrud->fieldDataBinding("rol", array("Admin","Nutricionista", "Coucher", "paciente"), "", "","array");//add data for radio button
+            $pdocrud->fieldDataBinding("rol", array("Admin", "Paciente"), "", "","array");//add data for radio button
             $pdocrud->fieldTypes("hash_password", "password", array("encryption"=>"sha1"));
             $pdocrud->checkDuplicateRecord(array("Correo"));
             $pdocrud->tableColFormatting("Sexo", "replace",array("0" =>"M"));
             $pdocrud->tableColFormatting("Sexo", "replace",array("1" =>"F"));
             $pdocrud->tableColFormatting("rol", "replace",array("0" =>"Admin"));
-            $pdocrud->tableColFormatting("rol", "replace",array("1" =>"Nutricionista"));
-            $pdocrud->tableColFormatting("rol", "replace",array("2" =>"Coucher"));
-            $pdocrud->tableColFormatting("rol", "replace",array("3" =>"Paciente"));
+            $pdocrud->tableColFormatting("rol", "replace",array("1" =>"Paciente"));
             $pdocrud->formFields(array("Nombre","Apellido","Correo", "hash_password", "Sexo", "rol"));
             $pdocrud->editFormFields(array("Nombre","Apellido", "Correo", "Sexo", "rol"));
             $usuarios = $pdocrud->dbTable("usuarios");
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
+            $rol = $pdocrud->getUserSession("role");
             $titleContent = "Usuarios";
             $subTitleContent = "Administracion de Usuarios";
             $level = "Usuarios";
@@ -39,6 +38,7 @@ class Usuarios extends CI_Controller {
             $this->template->set('titleContent', $titleContent);
             $this->template->set('subTitleContent', $subTitleContent);
             $this->template->set('level', $level);
+            $this->template->set('rol', $rol);
             $this->template->load('default_layout', 'contents' , 'usuarios', $data);
         }else{
              $this->load->view('403');

@@ -42,6 +42,8 @@ input[type=text]{
   border:1px solid #333;
   display:inline-block;
   margin:5px;
+  width: 200px;
+  height: 100px;
 }
 #btnOK{
   border:1px solid #000;
@@ -65,6 +67,7 @@ input[type=text]{
 <div id="panel">
   <input type="button" class="button btn btn-default" value="Comentar" id="btn1">
   <br>
+  <br>
   <!-- Dialog Box-->
   <div class="dialog" id="myform">
     <form>
@@ -73,6 +76,7 @@ input[type=text]{
       <input type="text" id="name">
       <div align="center">
         <input type="button" value="Ok" id="btnOK">
+        <input type="button" value="Cancelar" id="btnNo">
       </div>
 	</form>
   </div>
@@ -137,6 +141,10 @@ input[type=text]{
             $("#valueFromMyModal").val($("#myform input[type=text]").val().trim());
             window.location.href = "<?php echo base_url().'Alimentos/comentar/'.$codigo.'/'?>"+$("#name").val().trim();
         }
+    });
+    $("#btnNo").click(function() {
+        var modal = document.getElementById('myform');
+        modal.style.display = "none";
     });
 });
 </script>

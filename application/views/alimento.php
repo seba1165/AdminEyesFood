@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 echo $alimento;
 ?>
 <!-- Button trigger modal -->
-<button class="btn btn-info" id="btn-approve">Aprobar</button>
-<button class="btn btn-danger" id="btn-reject">Rechazar</button>
+<button <?php if ($ind['estadoAlimento'] != 2){ echo 'style="display:none;"'; } ?> class="btn btn-info" id="btn-approve">Aprobar</button>
+<button <?php if ($ind['estadoAlimento'] != 2){ echo 'style="display:none;"'; } ?> class="btn btn-danger" id="btn-reject">Rechazar</button>
 
 <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mi-modal">
   <div class="modal-dialog modal-sm">

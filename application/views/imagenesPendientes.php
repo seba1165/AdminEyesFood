@@ -35,9 +35,9 @@ height:100%;/* only if you want fixed height */
         <li class="active">
             <a  href="#1b" data-toggle="tab">Aprobados</a>
         </li>
-        <li>
+<!--        <li>
             <a href="#2b" data-toggle="tab">Pendientes</a>
-        </li>
+        </li>-->
     </ul>
 
     <div class="tab-content clearfix">

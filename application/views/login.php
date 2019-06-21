@@ -6,11 +6,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <link rel="stylesheet" href="<?php echo base_url();?>dist/css/login.css">
 </head>
 <div class="login-page">
-  <div class="form">    
     <form class="login-form">
-        <?php
-            echo $login->render("selectform");
-        ?>
+        <div class="form">
+            <a class="btn btn-light" href="#" role="button">Staff</a>
+            <a class="btn btn-primary" href="Login/login2" role="button">Salud</a>
+            <a class="btn btn-primary" href="#" role="button">Tiendas</a>
+            <?php echo $login;?>
+            </div>
     </form>
   </div>
 </div>
