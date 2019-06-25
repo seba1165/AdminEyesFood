@@ -18,14 +18,26 @@ class Recomendaciones extends CI_Controller {
             $subTitleContent = "Administracion de recomendaciones";
             $level = "Recomendaciones";
             if ($rol==2) {
+                $estado = $pdocrud->getUserSession("estado");
+                //Si esta activo
+                if ($estado == 1) {
 //                $pdocrud->setSettings("viewbtn", false);
 //                $pdocrud->setSettings("editbtn", false);
-                $pdocrud->setSettings("delbtn", false);
-                //$pdocrud->setSettings("addbtn", false);
+                    $pdocrud->setSettings("delbtn", false);
+                    //$pdocrud->setSettings("addbtn", false);
+                    $recomendaciones = $pdocrud->dbTable("recomendaciones")->render();
+                    $data['recomendaciones'] = $recomendaciones;
+                    $this->template("Recomendaciones", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "recomendaciones", $data, $rol);
+                //Si esta inactivo se muestra pantalla de permiso
+                }else{
+                    $this->load->view('estado');
+                }
+            //Si es administrador
+            }else{
+                $recomendaciones = $pdocrud->dbTable("recomendaciones")->render();
+                $data['recomendaciones'] = $recomendaciones;
+                $this->template("Recomendaciones", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "recomendaciones", $data, $rol);
             }
-            $recomendaciones = $pdocrud->dbTable("recomendaciones")->render();
-            $data['recomendaciones'] = $recomendaciones;
-            $this->template("Recomendaciones", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "recomendaciones", $data, $rol);
         }else{
              $this->load->view('403');
         }

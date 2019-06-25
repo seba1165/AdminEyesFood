@@ -12,6 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <a class="btn btn-light" href="#" role="button">Salud</a>
             <a class="btn btn-primary" href="#" role="button">Tiendas</a>
             <?php echo $login;?>
+            <a href="<?php echo base_url();?>Login/register">Es usted un profesional de la salud? Desea unirse a la comunidad EyesFood?</a>
     </form>
   </div>
 </div>

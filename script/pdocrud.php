@@ -58,3 +58,7 @@ function afterLoginCallBack2($data, $obj) {
         $obj->formRedirection("");
     }
 }
+
+function afterRegisterCallBack($data, $obj) {
+    $obj->formRedirection("http://localhost/AdminEyesFood/Login/registroDone");
+}

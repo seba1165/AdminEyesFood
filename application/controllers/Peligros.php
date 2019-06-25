@@ -18,14 +18,26 @@ class Peligros extends CI_Controller {
             $subTitleContent = "Administracion de peligros";
             $level = "Peligro de Alimentos";
             if ($rol==2) {
+                $estado = $pdocrud->getUserSession("estado");
+                //Si esta activo
+                if ($estado == 1) {
 //                $pdocrud->setSettings("viewbtn", false);
 //                $pdocrud->setSettings("editbtn", false);
-                $pdocrud->setSettings("delbtn", false);
-                //$pdocrud->setSettings("addbtn", false);
-            }   
-            $peligros = $pdocrud->dbTable("peligro_alimento")->render();
-            $data['peligros'] = $peligros;
-            $this->template("Peligros", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "peligros", $data, $rol);
+                    $pdocrud->setSettings("delbtn", false);
+                    //$pdocrud->setSettings("addbtn", false);
+                    $peligros = $pdocrud->dbTable("peligro_alimento")->render();
+                    $data['peligros'] = $peligros;
+                    $this->template("Peligros", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "peligros", $data, $rol);
+                //Si esta inactivo se muestra pantalla de permiso
+                }else{
+                    $this->load->view('estado');
+                }
+            //Si es administrador
+            }else{
+                $peligros = $pdocrud->dbTable("peligro_alimento")->render();
+                $data['peligros'] = $peligros;
+                $this->template("Peligros", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "peligros", $data, $rol);
+            }
         }else{
              $this->load->view('403');
         }

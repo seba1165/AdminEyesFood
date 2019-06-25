@@ -11,9 +11,9 @@ class Expertos extends CI_Controller {
         require_once "script/pdocrud.php";
         $pdocrud = new PDOCrud();
         if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("0"))){
-            $pdocrud->crudTableCol(array("idExperto","Nombre","Apellido","Correo","Especialidad","Telefono", "Direccion", "Descripcion", "PaginaWeb", "Reputacion", "rol"));
-            $pdocrud->formFields(array("nombre","apellido","correo","especialidad","telefono", "direccion", "descripcion", "paginaWeb", "reputacion", "rol"));
-            $pdocrud->editFormFields(array("nombre","apellido","correo","especialidad","telefono", "direccion", "descripcion", "paginaWeb", "reputacion", "rol"));
+            $pdocrud->crudTableCol(array("idExperto","Nombre","Apellido","Email","Especialidad","Telefono", "Direccion", "Descripcion", "PaginaWeb", "Reputacion", "rol"));
+            $pdocrud->formFields(array("nombre","apellido","email","especialidad","telefono", "direccion", "descripcion", "paginaWeb", "reputacion", "rol"));
+            $pdocrud->editFormFields(array("nombre","apellido","email","especialidad","telefono", "direccion", "descripcion", "paginaWeb", "reputacion", "rol"));
             $pdocrud->tableColFormatting("rol", "replace",array("0" =>"Nutricionista"));
             $pdocrud->tableColFormatting("rol", "replace",array("1" =>"Coucher"));
             $pdocrud->fieldTypes("rol", "radio");//change gender to radio button
