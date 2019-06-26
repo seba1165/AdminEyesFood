@@ -75,7 +75,10 @@
                       <li class="" <?php if ($rol != 0){ echo 'style="display:none;"'; } ?>>
                             <a href="<?php echo base_url();?>Usuarios"><i class="fa fa-users"></i> <span>Usuarios</span></a>
                         </li>
-                        <li class="treeview">
+                      <li class="" <?php if ($rol != 3){ echo 'style="display:none;"'; } ?>>
+                            <a href="<?php echo base_url();?>Consultas"><i class="fa fa-file"></i> <span>Consultas</span></a>
+                        </li>
+                        <li class="treeview" <?php if ($rol ==3 or $rol ==4){ echo 'style="display:none;"'; } ?>>
                             <a href="#">
                                 <i class="fa fa-apple"></i> <span>Alimentos</span>
                                 <span class="pull-right-container">
@@ -112,6 +115,20 @@
                             </ul>
                         </li>
                         <li <?php if ($rol != 0){ echo 'style="display:none;"'; } ?>><a href="<?php echo base_url();?>Expertos"><i class="fa fa-user-md"></i> <span>Expertos</span></a></li>
+                        <li <?php if ($rol != 0){ echo 'style="display:none;"'; } ?>><a href="<?php echo base_url();?>Tiendas/listTiendas"><i class="fa fa-home"></i> <span>Tiendas</span></a></li>
+                        <li <?php if ($rol != 4){ echo 'style="display:none;"'; } ?>><a href="<?php echo base_url();?>Alimento_tienda"><i class="fa fa-apple"></i> <span>Alimentos</span></a></li>
+                        <li class="treeview" <?php if ($rol != 4) { echo 'style="display:none;"'; } ?>>
+                            <a href="#">
+                                <i class="fa fa-list"></i> <span>Solicitudes</span>
+                                <span class="pull-right-container">
+                                  <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li><a href="<?php echo base_url();?>Alimento_tienda/pendientes"><i class="fa fa fa-hourglass-start"></i> <span>Pendientes</span></a></li>
+                                <li><a href="<?php echo base_url();?>Alimento_tienda/rechazados"><i class="fa fa-times"></i> <span>Rechazados</span></a></li>
+                            </ul>
+                        </li>
                     </ul><!-- /.sidebar-menu -->    
                 </section>
                 <!-- /.sidebar -->
@@ -129,6 +146,8 @@
                   <h3 class="control-sidebar-heading">Opciones</h3>
                   <ul class="control-sidebar-menu">
                     <li>
+                        <a href="<?php echo base_url();?>Tiendas" <?php if ($rol != 4){ echo 'style="display:none;"'; } ?>>Perfil</a>
+                        <a href="<?php echo base_url();?>Usuarios/perfil" <?php if ($rol != 0){ echo 'style="display:none;"'; } ?>>Perfil</a>
                         <a href="<?php echo base_url();?>Login/logout">Cerrar Sesion</a>
                     </li>
                   </ul><!-- /.control-sidebar-menu -->

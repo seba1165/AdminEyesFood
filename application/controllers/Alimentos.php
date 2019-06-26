@@ -389,8 +389,18 @@ class Alimentos extends CI_Controller {
             $pdomodel->where("idAlimentoNuevo", $id);
             $pdomodel->update("alimento_nuevo", $updateData);
             //Insertar en Alimentos
-            $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]);
-            $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
+            $rol = $pdocrud->getUserSession("role");
+            if ($rol==2) {
+                $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]." - ".$ind["marca"]." - ".$ind["contenidoNeto"], "idExperto" => $pdocrud->getUserSession("userId"));
+                $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
+            //Si es administrador
+            }else{
+                if (true) {
+                    
+                }
+                $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]." - ".$ind["marca"]." - ".$ind["contenidoNeto"]);
+                $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
+            }
             $insertData2 = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "fechaEscaneo" => $ind["date"]);
             $pdocrud->getPDOModelObj()->insert("historial_escaneo", $insertData2);
             //$this->images($ind["codigoBarras"]);

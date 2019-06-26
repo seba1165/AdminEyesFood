@@ -27,6 +27,12 @@ function beforeloginCallback($data, $obj) {
     return $data;
 }
 
+function beforeUpdateCallback($data, $obj) {  
+    //do something like if your passwords are md5 encrypted then change the value
+    $data["tiendas"]["hash_password"] = sha1($data["tiendas"]["hash_password"]);
+    return $data;
+}
+
 function beforeloginCallback2($data, $obj) {  
     //do something like if your passwords are md5 encrypted then change the value
     $data["expertos"]["hash_password"] = sha1($data["expertos"]["hash_password"]);
@@ -51,7 +57,19 @@ function afterLoginCallBack2($data, $obj) {
     if (count($data)) {
     //save data in session
         $_SESSION["data"] = $data;
-        $obj->formRedirection("http://localhost/AdminEyesFood/Alimentos/todos");
+        $obj->formRedirection("http://localhost/AdminEyesFood/Expertos/perfil");
+    }
+    else{
+        //no record found so don't redirect
+        $obj->formRedirection("");
+    }
+}
+function afterLoginCallBackTienda($data, $obj) {
+    @session_start();
+    if (count($data)) {
+    //save data in session
+        $_SESSION["data"] = $data;
+        $obj->formRedirection("http://localhost/AdminEyesFood/Tiendas/index");
     }
     else{
         //no record found so don't redirect
@@ -59,6 +77,23 @@ function afterLoginCallBack2($data, $obj) {
     }
 }
 
+//example of how to add action function
+function beforeloginCallbackTienda($data, $obj) {  
+    //do something like if your passwords are md5 encrypted then change the value
+    $data["tiendas"]["hash_password"] = sha1($data["tiendas"]["hash_password"]);
+    return $data;
+}
+
 function afterRegisterCallBack($data, $obj) {
     $obj->formRedirection("http://localhost/AdminEyesFood/Login/registroDone");
+}
+
+function afterUpdateCallBack($data, $obj) {
+    //$obj->formRedirection(base_url());
+    $obj->formRedirection("http://localhost/AdminEyesFood/Tiendas");
+}
+
+function afterUpdateCallBack2($data, $obj) {
+    //$obj->formRedirection(base_url());
+    $obj->formRedirection("http://localhost/AdminEyesFood/Usuarios/perfil");
 }
