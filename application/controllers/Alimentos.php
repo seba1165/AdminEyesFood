@@ -395,11 +395,12 @@ class Alimentos extends CI_Controller {
                 $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
             //Si es administrador
             }else{
-                if (true) {
-                    
-                }
                 $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]." - ".$ind["marca"]." - ".$ind["contenidoNeto"]);
                 $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
+            }
+            if (isset($ind['idTienda'])or $ind['idTienda']!="") {
+                $insertData3 = array("codigoBarras" => $ind["codigoBarras"], "idTienda" => $ind["idTienda"]);
+                $pdocrud->getPDOModelObj()->insert("alimento_tienda", $insertData3);
             }
             $insertData2 = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "fechaEscaneo" => $ind["date"]);
             $pdocrud->getPDOModelObj()->insert("historial_escaneo", $insertData2);
