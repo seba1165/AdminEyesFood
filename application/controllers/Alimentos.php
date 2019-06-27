@@ -398,12 +398,14 @@ class Alimentos extends CI_Controller {
                 $insertData = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "nombreAlimento" => $ind["nombreAlimento"]." - ".$ind["marca"]." - ".$ind["contenidoNeto"]);
                 $pdocrud->getPDOModelObj()->insert("alimentos", $insertData);
             }
-            if (isset($ind['idTienda'])or $ind['idTienda']!="") {
+            if (isset($ind['idTienda']) and $ind['idTienda']!="") {
                 $insertData3 = array("codigoBarras" => $ind["codigoBarras"], "idTienda" => $ind["idTienda"]);
                 $pdocrud->getPDOModelObj()->insert("alimento_tienda", $insertData3);
             }
-            $insertData2 = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "fechaEscaneo" => $ind["date"]);
-            $pdocrud->getPDOModelObj()->insert("historial_escaneo", $insertData2);
+            if (isset($ind['idUsuario'])and $ind['idUsuario']!="") {
+                $insertData2 = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "fechaEscaneo" => $ind["date"]);
+                $pdocrud->getPDOModelObj()->insert("historial_escaneo", $insertData2);
+            }
             //$this->images($ind["codigoBarras"]);
             redirect('/Alimentos/pendientes/');
         }else{
