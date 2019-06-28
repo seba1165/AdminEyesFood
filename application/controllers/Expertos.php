@@ -54,19 +54,57 @@ class Expertos extends CI_Controller {
         if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("2","3"))){
             $nombreApellido = $pdocrud->getUserSession("nombre")." ".$pdocrud->getUserSession("apellido");
             $username = $pdocrud->getUserSession("userName");
-            $pdomodel->where("email",$username,"=");
-            $result =  $pdomodel->select("expertos");
-            $obj = $result[0];
+            $estado = $pdocrud->getUserSession("estado");
+            if ($estado == 1) {
+                $pdomodel->where("email",$username,"=");
+                $result =  $pdomodel->select("expertos");
+                $obj = $result[0];
+                $rol = $pdocrud->getUserSession("role");
+                $titleContent = "Perfil";
+                $subTitleContent = "Perfil de Usuario";
+                $level = "Perfil";
+                $pdocrud->setPK("idExperto");
+                $pdocrud->setSettings("viewBackButton", false);
+                $pdocrud->setSettings("viewPrintButton", false);
+                $experto = $pdocrud->dbTable("expertos")->render("VIEWFORM",array("id" =>$obj['idExperto']));
+                $data['experto'] = $experto;
+                $data['aux'] = 3;
+                $this->template("Expertos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "perfil", $data, $rol);
+            //Si esta inactivo se muestra pantalla de permiso
+            }else{
+                $this->load->view('estado');
+            }
+            
+        }
+    }
+    
+    public function editar() {
+        header("Access-Control-Allow-Origin: *");
+        require_once "script/pdocrud.php";
+        $pdocrud = new PDOCrud();
+        if($pdocrud->checkUserSession("userId") and $pdocrud->checkUserSession("role", array("3","2"))){
+            $nombreApellido = $pdocrud->getUserSession("nombre");
+            $username = $pdocrud->getUserSession("userName");
             $rol = $pdocrud->getUserSession("role");
-            $titleContent = "Perfil";
-            $subTitleContent = "Perfil de Usuario";
-            $level = "Perfil";
-            $pdocrud->setPK("idExperto");
-            $pdocrud->setSettings("viewBackButton", false);
-            $pdocrud->setSettings("viewPrintButton", false);
-            $experto = $pdocrud->dbTable("expertos")->render("VIEWFORM",array("id" =>$obj['idExperto']));
-            $data['experto'] = $experto;
-            $this->template("Expertos", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "perfil", $data, $rol);
+            $titleContent = "Edicion de Perfil de Usuario";
+            $subTitleContent = "Edicion de Perfil";
+            $level = "Perfil de Usuario";
+            $estado = $pdocrud->getUserSession("estado");
+            if ($estado == 1) {
+                $pdocrud->setPK("idExperto");
+                $pdocrud->setSettings("viewBackButton", false);
+                $pdocrud->setSettings("viewPrintButton", false);
+                $pdocrud->addCallback("after_update", "afterUpdateCallBack2");
+                $pdocrud->formFields(array("nombre","apellido","email","especialidad","telefono","direccion","descripcion","paginaWeb"));
+                $experto = $pdocrud->dbTable("expertos")->render("EDITFORM",array("id" =>$pdocrud->getUserSession("userId")));
+                $data['experto'] = $experto;
+                $data['aux'] = 1;
+                $this->template("Tiendas", $username, $nombreApellido, $titleContent, $subTitleContent, $level, "perfil", $data, $rol);
+            }else{
+                $this->load->view('estado');
+            }
+        }else{
+             $this->load->view('403');
         }
     }
 }
