@@ -401,15 +401,53 @@ class Alimentos extends CI_Controller {
             if (isset($ind['idTienda']) and $ind['idTienda']!="") {
                 $insertData3 = array("codigoBarras" => $ind["codigoBarras"], "idTienda" => $ind["idTienda"]);
                 $pdocrud->getPDOModelObj()->insert("alimento_tienda", $insertData3);
+                $pdomodel->where("idTienda", $ind['idTienda']);
+                $obj =  $pdomodel->select("tiendas");
+                $this->notificar($obj['email'], $ind);
+                
             }
             if (isset($ind['idUsuario'])and $ind['idUsuario']!="") {
                 $insertData2 = array("codigoBarras" => $ind["codigoBarras"], "idUsuario" => $ind["idUsuario"], "fechaEscaneo" => $ind["date"]);
                 $pdocrud->getPDOModelObj()->insert("historial_escaneo", $insertData2);
+                $pdomodel->where("idUsuario", $ind['idUsuario']);
+                $obj =  $pdomodel->select("usuarios");
+                $this->notificar($obj['Correo'], $ind);
             }
             //$this->images($ind["codigoBarras"]);
             redirect('/Alimentos/pendientes/');
         }else{
             echo 'no guardado';
+        }
+    }
+    
+    public function notificar($correo, $alimento) {
+        if (isset($correo)){
+            $destinatario = $correo;
+            $asunto = "Solicitud de Alimento Nuevo";
+            $cuerpo = ' 
+                <html> 
+                <head> 
+                   <title>Nuevo Alimento</title> 
+                </head> 
+                <body> 
+                <h1>Hola!</h1> 
+                <p> 
+                <b>Su solicitud de nuevo alimento ha sido aceptada</b>.</p> <p>A continuacion estan los datos del alimento que solicito subir a la plataforma.</p>  
+                <p>Codigo de Barras: '.$alimento['codigoBarras'].'</p>
+                <p>Nombre: '.$alimento['nombreAlimento'].'</p>
+                <p>Marca: '.$alimento['marca'].'</p>
+                <p>Categoria: '.$alimento['producto'].'</p>
+                <p></p>
+                 <b>Gracias por utilizar EyesFood</b>
+                </body> 
+                </html> 
+                ';
+            $headers = "MIME-Version: 1.0\r\n"; 
+            $headers .= "Content-type: text/html; charset=iso-8859-1\r\n"; 
+
+            //dirección del remitente 
+            $headers .= "From: EyesFood <eyesfood@correo.com>\r\n";
+            mail($destinatario,$asunto,$cuerpo,$headers);
         }
     }
     
