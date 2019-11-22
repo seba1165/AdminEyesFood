@@ -23,6 +23,7 @@ class Login extends CI_Controller {
         $pdocrud->setUserSession("apellido", "Apellido");
         $pdocrud->setUserSession("lastLoginTime", date("now"));
         $pdocrud->fieldRenameLable("hash_password", "Password");
+        $pdocrud->buttonHide($buttonname="cancel");
         $login = $pdocrud->dbTable("usuarios")->render("selectform");
         $data['login'] = $login;
         $this->load->helper('url');
@@ -45,6 +46,7 @@ class Login extends CI_Controller {
         $pdocrud->setUserSession("apellido", "apellido");
         $pdocrud->setUserSession("estado", "activo");
         $pdocrud->setUserSession("lastLoginTime", date("now"));
+        $pdocrud->buttonHide($buttonname="cancel");
         $pdocrud->fieldRenameLable("hash_password", "Password");
         $login = $pdocrud->dbTable("expertos")->render("selectform");
         $data['login'] = $login;
@@ -68,6 +70,7 @@ class Login extends CI_Controller {
         $pdocrud->setUserSession("estado", "activo");
         $pdocrud->setUserSession("lastLoginTime", date("now"));
         $pdocrud->fieldRenameLable("hash_password", "Password");
+        $pdocrud->buttonHide($buttonname="cancel");
         $login = $pdocrud->dbTable("tiendas")->render("selectform");
         $data['login'] = $login;
         $this->load->helper('url');
@@ -98,6 +101,7 @@ class Login extends CI_Controller {
         $pdocrud->fieldNotMandatory("telefono");
         $pdocrud->fieldNotMandatory("direccion");
         $pdocrud->fieldNotMandatory("paginaWeb");
+        $pdocrud->buttonHide($buttonname="cancel");
         //$pdocrud->recaptcha("6LeW1KoUAAAAAJyRLSZF5kezshtEEjbLtqaBTjzK","6LeW1KoUAAAAAIsvauCrbfHYsNysRiVLiUrxHrYT");
         $registro = $pdocrud->dbTable("expertos")->render("insertform");
         $data['registro'] = $registro;
@@ -126,6 +130,7 @@ class Login extends CI_Controller {
         $pdocrud->fieldNotMandatory("twitter");
         $pdocrud->fieldNotMandatory("instagram");
         $pdocrud->fieldNotMandatory("rss");
+        $pdocrud->buttonHide($buttonname="cancel");
         //$pdocrud->recaptcha("6LeW1KoUAAAAAJyRLSZF5kezshtEEjbLtqaBTjzK","6LeW1KoUAAAAAIsvauCrbfHYsNysRiVLiUrxHrYT");
         $registro = $pdocrud->dbTable("tiendas")->render("insertform");
         $data['registro'] = $registro;
