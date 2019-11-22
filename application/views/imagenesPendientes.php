@@ -30,29 +30,9 @@ height:100%;/* only if you want fixed height */
 }
 </style>
 </head>
-<div id="exTab3" class="container" style="width: 100%; height: 100%">	
-    <ul  class="nav nav-pills">
-        <li class="active">
-            <a  href="#1b" data-toggle="tab">Aprobados</a>
-        </li>
-<!--        <li>
-            <a href="#2b" data-toggle="tab">Pendientes</a>
-        </li>-->
-    </ul>
-
-    <div class="tab-content clearfix">
-        <div class="tab-pane active responsive" id="1b">
-            <?php
+<?php
             echo $alimentos2->render();
             ?>
-        </div>
-        <div class="tab-pane" id="2b">
-            <?php
-            echo $alimentos->render();
-            ?>
-        </div>
-    </div>
-</div>
 
 <!-- Bootstrap core JavaScript
 ================================================== -->

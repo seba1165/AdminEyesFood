@@ -102,7 +102,7 @@
                                   </a>
                                   <ul class="treeview-menu">
                                     <li><a href="#"><i class="fa fa-check"></i> Aceptados</a></li>
-                                    <li><a href="#"><i class="fa fa-hourglass-start"></i> Pendientes</a></li>
+                                    <li><a href="<?php echo base_url();?>Alimentos/pendientesEdit"><i class="fa fa-hourglass-start"></i> Pendientes</a></li>
                                     <li><a href="#"><i class="fa fa-times"></i> Rechazados</a></li>
                                   </ul>
                                 </li>
