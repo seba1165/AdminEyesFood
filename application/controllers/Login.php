@@ -87,8 +87,13 @@ class Login extends CI_Controller {
     public function register(){
         $pdocrud = new PDOCrud();
         $pdocrud->addCallback("after_insert", "afterRegisterCallBack");
-        $pdocrud->formFieldValue("rol", "2");
-        $pdocrud->fieldDataAttr("rol", array("disabled"=>"disabled"));
+        $pdocrud->tableColFormatting("rol", "replace",array("0" =>"Nutricionista"));
+        $pdocrud->tableColFormatting("rol", "replace",array("1" =>"Coucher"));
+        $pdocrud->fieldTypes("rol", "radio");//change gender to radio button
+        $roles = array("2"=>"Nutricionista","3"=>"Coach");
+        $pdocrud->fieldDataBinding("rol", $roles, "", "","array");//add data for radio button
+//        $pdocrud->formFieldValue("rol", "2");
+//        $pdocrud->fieldDataAttr("rol", array("disabled"=>"disabled"));
         $pdocrud->formFields(array("nombre", "apellido", "email", "especialidad", "telefono", "direccion", "rol","descripcion", "paginaWeb","hash_password"));
         $pdocrud->fieldTypes("hash_password", "password", array("encryption"=>"sha1"));
         $pdocrud->formStaticFields("personalinfo", "html", "<h3>1.Solicitud de Registro de Profesional </h3><br><small>Ingrese su información. Todos los campos son requeridos</small>");//html field
@@ -98,6 +103,8 @@ class Login extends CI_Controller {
         $pdocrud->fieldDesc("Términos_y_condiciones", $link);// Add field description
         $pdocrud->checkDuplicateRecord(array("email"));
         $pdocrud->fieldTooltip("descripcion", "Por favor, ingrese su información academica y de formación. relacionada al área de salud");//tooltip
+        $pdocrud->fieldRenameLable("paginaWeb", "Pagina Web");
+        $pdocrud->fieldRenameLable("hash_password", "Password");
         $pdocrud->fieldNotMandatory("telefono");
         $pdocrud->fieldNotMandatory("direccion");
         $pdocrud->fieldNotMandatory("paginaWeb");
